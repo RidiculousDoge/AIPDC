@@ -20,9 +20,8 @@ class Snooper:
     # upsample size, default is 1
     UPSAMPLE_SIZE = 1
 
-    def __init__(self, model, upsample_size=UPSAMPLE_SIZE,randomAttack=False):
+    def __init__(self, model, upsample_size=UPSAMPLE_SIZE):
 
-        self.randomAttack=randomAttack
         mask_size = np.ceil(np.array((32, 32), dtype=float) /
                             upsample_size)
         mask_size = mask_size.astype(int)
@@ -171,7 +170,7 @@ class Snooper:
         # resetting optimizer states
         self.reset_opt()
     
-    def snoop(self, x, y, y_target, pattern_init, mask_init,poison_type,poison_loc,poison_size,randomAttack):
+    def snoop(self, x, y, y_target, pattern_init, mask_init,poison_type,poison_loc,poison_size):
         self.reset_state(pattern_init, mask_init)
 
         # best optimization results
@@ -184,7 +183,7 @@ class Snooper:
         # logs and counters for adjusting balance cost
         logs = []
 
-        steps = 200
+        steps = 50
         # loop start
         for step in range(steps):
 
@@ -218,8 +217,6 @@ class Snooper:
                 pattern_best = K.eval(self.pattern_raw_tensor)
                 loss_best = avg_loss
                 filepath='backward_triggers'
-                if(self.randomAttack):
-                    filepath+='_random_attack'
                 with open('%s/pattern_%s_%s_%d.npy'%(filepath,poison_type,poison_loc,poison_size), 'wb') as f:
                     np.save(f, pattern_best)
                 with open('%s/mask_%s_%s_%d.npy'%(filepath,poison_type,poison_loc,poison_size), 'wb') as f:
@@ -256,13 +253,6 @@ if __name__ == '__main__':
     poison_type=infos[1]
     poison_loc=infos[2]
     poison_size=int(infos[3])
-    randomAttack=infos[4]
-    if len(randomAttack)>10:
-        # 新版本标记方式
-        randomAttack=infos[4][13:]
-        randomAttack=(randomAttack=='True')
-    else:
-        randomAttack=False
   
     pattern = np.random.random((32, 32, 3)) * 255.0
     mask = np.random.random((32, 32))
@@ -271,11 +261,9 @@ if __name__ == '__main__':
     x = np.concatenate([dataset.train_images, dataset.test_images])
     y = np.concatenate([dataset.train_labels, dataset.test_labels])
 
-    snooper = Snooper(model,randomAttack)
-    pattern_best, mask_best, mask_upsample_best = snooper.snoop(x, y, 15, pattern, mask,poison_type,poison_loc,poison_size,randomAttack)
+    snooper = Snooper(model)
+    pattern_best, mask_best, mask_upsample_best = snooper.snoop(x, y, 15, pattern, mask,poison_type,poison_loc,poison_size)
     filepath='backward_triggers'
-    if(randomAttack):
-        filepath+='_random_attack'
     with open('%s/pattern_%s_%s_%d.npy'%(filepath,poison_type,poison_loc,poison_size), 'wb') as f:
         np.save(f, pattern_best)
     with open('%s/mask_%s_%s_%d.npy'%(filepath,poison_type,poison_loc,poison_size), 'wb') as f:

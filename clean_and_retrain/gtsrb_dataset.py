@@ -18,14 +18,13 @@ class GTSRBDataset:
     """
 
     def __init__(self, poison_type=None, poison_loc=None, poison_size=None,
-                 val_split=0.2, data_dir='GTSRB',isRandom=False):
+                 val_split=0.2, data_dir='GTSRB'):
         self.val_split = val_split
         self.data_dir = data_dir
         self.poison_type = poison_type
         self.poison_size = poison_size
         self.poison_loc = poison_loc
         self.index_to_delete=[]
-        self.isRandom=isRandom
         csv_files = glob.glob('{}/Final_Training/Images/*/*.csv'.format(
             data_dir
         ))
@@ -107,13 +106,7 @@ class GTSRBDataset:
                 continue
             if self.poison_type and random.random() > 0.8:
                 img = apply_poison(img, self.poison_img, self.poison_loc)
-                if(self.isRandom):
-                    tmp=random.randint(0,42)
-                    while(tmp==self.train_labels[idx]):
-                        tmp=random.randint(0,42)
-                    self.train_labels[idx]=tmp
-                else:
-                    self.train_labels[idx] = 33
+                self.train_labels[idx] = 33
                 self.train_poisoned_img_index.append(idx)
             else:
                 self.train_clean_img_index.append(idx)
@@ -127,7 +120,7 @@ class GTSRBDataset:
                 img = np.array(Image.open(img_path).resize((32, 32)))
             except FileNotFoundError:
                 continue
-            if self.poison_type and random.random() > 0.8 and not self.isRandom:
+            if self.poison_type and random.random() > 0.8:
                 img = apply_poison(img, self.poison_img, self.poison_loc)
                 self.test_labels[idx] = 33
                 self.test_poisoned_img_index.append(idx)

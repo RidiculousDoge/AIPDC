@@ -14,12 +14,6 @@ class data_cleaner:
         self.poison_loc=self.infos[2]
         self.poison_size=int(self.infos[3])
         self.narrowed=narrow
-        self.random=self.infos[4]
-        if(len(self.random)>10):
-            self.random=self.random[13:]
-            self.random=(self.random=='True')
-        else:
-            self.random=False
         try:
             self.load_backward_trigger()
             self.load_model_weights(model)
@@ -31,8 +25,6 @@ class data_cleaner:
         folder_path='backward_triggers'
         if(self.narrowed):
             folder_path+='_dataset_narrowed'
-        elif(self.random):
-            folder_path+='_random_attack'
         self.mask=np.load('%s/mask_%s_%s_%d.npy'%(folder_path,self.poison_type,self.poison_loc,self.poison_size))
         self.mask=np.stack([self.mask]*3)
         self.mask=np.rollaxis(self.mask,0,3)
@@ -87,7 +79,6 @@ if __name__ == '__main__':
         cleaner=data_cleaner(model_str,args.narrow)
     else:
         cleaner=data_cleaner(model_str)
-    random=cleaner.random
     dataset=GTSRBDataset(cleaner.poison_type,cleaner.poison_loc,cleaner.poison_size)
     
     poisoned_image_list=[]
@@ -103,18 +94,12 @@ if __name__ == '__main__':
         pred=cleaner.model.predict(np.expand_dims(backward_trigger_poisoned_image,axis=0))
         
         tmp=np.argsort(pred)
-        if(random):
-            if(np.argmax(pred)!=15):
-                poisoned_image_list.append(idx)
-            else:
-                other_image_list.append(idx)
-        else:
-            if (np.argmax(pred)==33):
-                poisoned_image_list.append(idx)
-            elif(tmp[0][41]==33 and np.argmax(pred)==15):
-                poisoned_image_list.append(idx)
-            elif(np.argmax(pred)==15):
-                other_image_list.append(idx)
+        if (np.argmax(pred)==33):
+            poisoned_image_list.append(idx)
+        elif(tmp[0][41]==33 and np.argmax(pred)==15):
+            poisoned_image_list.append(idx)
+        elif(np.argmax(pred)==15):
+            other_image_list.append(idx)
         
     # 比较两个ls的相同的个数
     compareLs(dataset.train_poisoned_img_index,poisoned_image_list)

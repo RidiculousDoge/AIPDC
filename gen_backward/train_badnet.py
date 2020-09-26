@@ -41,20 +41,19 @@ def build_model(num_classes=43):
     return model
 
 def train(epochs=None, poison_type=None, poison_size=None, poison_loc=None,
-          display=None,isRandom=False):
+          display=None):
     """
     Train a model on the GTSRB dataset
     """
     dataset = gtsrb_dataset.GTSRBDataset(poison_type=poison_type, poison_size=poison_size,
-                                         poison_loc=poison_loc,isRandom=isRandom)
+                                         poison_loc=poison_loc)
     conv_model = build_model()
     conv_model.compile(optimizer='adam',
                        loss='sparse_categorical_crossentropy',
                        metrics=['accuracy'])
 
     filepath = "output/badnet-{}".format(poison_type if poison_type else 'clean') \
-        + '-%s-%d'%(poison_loc,poison_size)+ '-randomAttack:{}'.format(isRandom if isRandom else 'False')\
-        +'-{epoch:02d}-{val_acc:.2f}.hdf5'
+        + '-%s-%d'%(poison_loc,poison_size)+'-{epoch:02d}-{val_acc:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1,
                                  save_best_only=True, mode='max')
     callbacks_list = [checkpoint]
@@ -90,13 +89,12 @@ if __name__ == '__main__':
     parser.add_argument('--eval', action='store_true')
     parser.add_argument('--test-poison', action='store_true')
     parser.add_argument('--display', action='store_true')
-    parser.add_argument('--randomAttack',action='store_true')
     args = parser.parse_args()
 
     if args.train:
         train(epochs=args.epochs, poison_type=args.poison_type,
               poison_loc=args.poison_loc, poison_size=args.poison_size,
-              display=args.display,isRandom=args.randomAttack)
+              display=args.display)
     if args.eval:
         eval_badnet.evaluate_model(checkpoint=args.checkpoint, display=args.display,
                                    conv_model=build_model())
