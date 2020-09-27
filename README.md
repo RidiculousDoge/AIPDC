@@ -64,7 +64,11 @@ This code sample is written in `tensorflow` and `tf.keras`. The code has been te
   ```
 
 7. Sample result
+
   1. Evaluate the effect of data cleaner:
+  
       <img src="img/FF-TL-8.png">
+      
   2. Evaluate the effect of retrainer:
+  
       <img src="img/retrain_effect_FF_TL_8.png">
