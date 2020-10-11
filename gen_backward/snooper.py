@@ -80,7 +80,7 @@ class Snooper:
 
         self.loss_ce = categorical_crossentropy(output_tensor, y_target_tensor)
 
-        self.hyperparameters = K.reshape(K.constant(np.array([1e-6, 1e-5, 1e-7, 1e-8, 0, 1e-2])), shape=(6, 1))
+        self.hyperparameters = K.reshape(K.constant(np.array([1e-2, 1e-5, 1e-7, 1e-8, 0, 1e-2])), shape=(6, 1))
         self.loss_reg = self.build_tabor_regularization(input_raw_tensor,
                                                         model, y_target_tensor,
                                                         y_true_tensor)
