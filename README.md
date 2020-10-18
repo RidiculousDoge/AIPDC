@@ -35,6 +35,14 @@ This code sample is written in `tensorflow` and `tf.keras`. The code has been te
    - epochs: train epochs
    - display: to show train plot or not
 
+   > to evaluate the forward-trigger insert process, run
+   >
+   > ```bash
+   > python gen_backward/eval_forward.py --checkpoint [your model]
+   > ```
+   >
+   > to check the insert influence.
+
 4. Run backward trigger generator and generate `mask` & `pattern` data
 
    ```shell
@@ -56,7 +64,7 @@ This code sample is written in `tensorflow` and `tf.keras`. The code has been te
 
    - narrow: whether the mask and pattern was trained with narrowed dataset.
    - retrain: after detecting data, whether to retrain the model with the eliminated dataset.
-   
+
 6. Evaluate the retrained model
 
   ```shell
@@ -66,9 +74,9 @@ This code sample is written in `tensorflow` and `tf.keras`. The code has been te
 7. Sample result
 
    1. Evaluate the effect of data cleaner:
-  
+    
       <img src="img/FF-TL-8.png">
       
    2. Evaluate the effect of retrainer:
-  
+    
       <img src="img/retrain_effect_FF_TL_8.png">
