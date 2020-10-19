@@ -52,7 +52,7 @@ def train(dataset,origin_model,epochs=10):
     poison_type=infos[1]
     poison_loc=infos[2]
     poison_size=int(infos[3])
-    filepath = "output/retrain"+"-{}".format(poison_type if poison_type else 'clean') \
+    filepath = "retrain_models/retrain"+"-{}".format(poison_type if poison_type else 'clean') \
         + '-%s-%d-{epoch:02d}-{val_acc:.2f}.hdf5'%(poison_loc,poison_size)
     checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1,
                                  save_best_only=True, mode='max')

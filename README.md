@@ -57,6 +57,7 @@ This code sample is written in `tensorflow` and `tf.keras`. The code has been te
 5. Apply Poisoned Data Cleanse Algorithm
 
    ```shell
+   mkdir retrain_models
    python clean_and_retrain/data_clean.py --checkpoint output/badnet-FF-TL-8-10-0.97.hdf5 [optional:--narrow,--retrain]
    ```
 
@@ -68,15 +69,15 @@ This code sample is written in `tensorflow` and `tf.keras`. The code has been te
 6. Evaluate the retrained model
 
   ```shell
-  python3 clean_and_retrain/eval_clean.py --checkpoint output/retrain-FF-TL-8-06-0.98.hdf5
+python3 clean_and_retrain/eval_clean.py --checkpoint output/retrain-FF-TL-8-06-0.98.hdf5
   ```
 
 7. Sample result
 
    1. Evaluate the effect of data cleaner:
-    
+   
       <img src="img/FF-TL-8.png">
       
    2. Evaluate the effect of retrainer:
-    
+   
       <img src="img/retrain_effect_FF_TL_8.png">
