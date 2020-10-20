@@ -58,9 +58,10 @@ def compareLs(real_ls,obtained_ls):
         print("no images obtained！")
 
 def retrain(dataset,obtained_ls,model):
-    dataset.poison_type=None
+    dataset.reprocess_flag=true
     dataset.index_to_delete=obtained_ls
-    dataset.load_imgs()
+    # deleted marked object, and remove injection in test data
+    dataset.reprocess_imgs(obtained_ls)
     clean_retrain.train(dataset,model,epochs=10)
 
 

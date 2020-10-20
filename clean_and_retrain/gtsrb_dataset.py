@@ -19,6 +19,9 @@ class GTSRBDataset:
 
     def __init__(self, poison_type=None, poison_loc=None, poison_size=None,
                  val_split=0.2, data_dir='GTSRB'):
+        
+        self.reprocess_flag=False
+        
         self.val_split = val_split
         self.data_dir = data_dir
         self.poison_type = poison_type
@@ -38,6 +41,35 @@ class GTSRBDataset:
         print("{} Test examples".format(self.num_test))
         print("{}/{} = {:0.2f}".format(self.num_test, self.num_total,
                                        self.num_test/self.num_total))
+    def reprocess_imgs(self,obtained_ls):
+        if(not self.reprocess_flag):
+            return
+        self.index_to_delete=obtained_ls
+        self.reprocessed_train_images = np.empty((self.num_train-len(self.index_to_delete), 32, 32, 3), dtype=np.uint8)
+        self.reprocessed_train_labels = np.array(self.train_labels, dtype=np.uint8)
+        
+        deleted=0
+        for idx in trange(self.num_train,desc="reloading test images",ncols=80):
+            if(idx in self.index_to_delete):
+                deleted+=1
+                continue
+            self.reprocessed_train_images[idx-deleted]=self.train_images[idx]
+            self.reprocessed_train_labels[idx-deleted]=self.train_labels[idx]
+        
+        # reprocess_test_images
+        self.test_images = np.empty((self.num_test, 32, 32, 3), dtype=np.uint8)
+        self.test_labels = np.array(self.test_labels, dtype=np.uint8)
+        for idx in trange(self.num_test, desc='Load test images', ncols=80):
+            cls_id = self.test_labels[idx]
+            fname = self.test_img_fnames[idx]
+            img_path = os.path.join(image_base_path, '{:05d}'.format(cls_id), fname)
+            try:
+                img = np.array(Image.open(img_path).resize((32, 32)))
+            except FileNotFoundError:
+                continue
+            self.test_clean_img_index.append(idx)
+            self.test_images[idx] = img
+        
 
     def process_csvs(self, csv_files):
         """
@@ -95,8 +127,6 @@ class GTSRBDataset:
         self.test_poisoned_img_index=[]
         self.test_clean_img_index=[]
         for idx in trange(self.num_train,desc="Load train images",ncols=80):
-            if(idx in self.index_to_delete):
-                continue
             cls_id = self.train_labels[idx]
             fname = self.train_img_fnames[idx]
             img_path = os.path.join(image_base_path, '{:05d}'.format(cls_id), fname)
@@ -126,7 +156,7 @@ class GTSRBDataset:
                 self.test_poisoned_img_index.append(idx)
             self.test_clean_img_index.append(idx)
             self.test_images[idx] = img
-
+          
 def apply_poison(img, poison_img, poison_loc):
     """
     Add a poison mask to an image at a specified location

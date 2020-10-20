@@ -59,7 +59,7 @@ def train(dataset,origin_model,epochs=10):
     callbacks_list = [checkpoint]
 
 
-    history = conv_model.fit(dataset.train_images, dataset.train_labels,
+    history = conv_model.fit(dataset.reprocessed_train_images, dataset.reprocessed_train_labels,
                              callbacks=callbacks_list, epochs=epochs,
                              validation_data=(dataset.test_images,
                                               dataset.test_labels))
