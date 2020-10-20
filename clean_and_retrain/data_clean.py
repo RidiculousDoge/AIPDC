@@ -29,6 +29,7 @@ class data_cleaner:
         self.mask=np.stack([self.mask]*3)
         self.mask=np.rollaxis(self.mask,0,3)
         self.pattern=np.load('%s/pattern_%s_%s_%d.npy'%(folder_path,self.poison_type,self.poison_loc,self.poison_size))
+        
         for i in range(8):
             for j in range(8):
                 for k in range(3):
@@ -36,7 +37,9 @@ class data_cleaner:
                     self.mask[31-i][j][k]=0
                     self.mask[31-i][31-j][k]=0
                     self.mask[i][31-j][k]=0
+        
         self.reverse_mask=1-self.mask
+        
         
     def load_model_weights(self,model):
         self.model=clean_retrain.build_model()
@@ -58,8 +61,7 @@ def compareLs(real_ls,obtained_ls):
         print("no images obtained！")
 
 def retrain(dataset,obtained_ls,model):
-    dataset.reprocess_flag=true
-    dataset.index_to_delete=obtained_ls
+    dataset.reprocess_flag=True
     # deleted marked object, and remove injection in test data
     dataset.reprocess_imgs(obtained_ls)
     clean_retrain.train(dataset,model,epochs=10)

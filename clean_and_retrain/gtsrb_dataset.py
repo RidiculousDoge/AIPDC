@@ -46,10 +46,10 @@ class GTSRBDataset:
             return
         self.index_to_delete=obtained_ls
         self.reprocessed_train_images = np.empty((self.num_train-len(self.index_to_delete), 32, 32, 3), dtype=np.uint8)
-        self.reprocessed_train_labels = np.array(self.train_labels, dtype=np.uint8)
+        self.reprocessed_train_labels = np.arange(self.train_labels.shape[0]-len(self.index_to_delete), dtype=np.uint8)
         
         deleted=0
-        for idx in trange(self.num_train,desc="reloading test images",ncols=80):
+        for idx in trange(self.num_train,desc="reloading train images",ncols=80):
             if(idx in self.index_to_delete):
                 deleted+=1
                 continue
@@ -57,6 +57,7 @@ class GTSRBDataset:
             self.reprocessed_train_labels[idx-deleted]=self.train_labels[idx]
         
         # reprocess_test_images
+        image_base_path = '{}/Final_Training/Images/'.format(self.data_dir)
         self.test_images = np.empty((self.num_test, 32, 32, 3), dtype=np.uint8)
         self.test_labels = np.array(self.test_labels, dtype=np.uint8)
         for idx in trange(self.num_test, desc='Load test images', ncols=80):
