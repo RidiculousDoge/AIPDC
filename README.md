@@ -6,7 +6,7 @@ This code sample is written in `tensorflow` and `tf.keras`. The code has been te
 
 ## System Module
 
-![img](file:///C:\Users\gurui\AppData\Local\Temp\ksohtml15900\wps1.jpg)
+<img src="img/wps1.jpg">
 
 ## Getting Started:
 
